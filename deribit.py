@@ -10,7 +10,7 @@ from typing import List
 class Deribit():
     def __init__(self, key, secret):
         self._client = ccxt.deribit({"apiKey": key, "secret": secret})
-        self._client.load_markets(reload = True)
+        self._client.load_markets(reload=True)
 
     def findOption(self, base: str, optionType: str, settlementPeriod: str, delta: float):
         '''
@@ -67,7 +67,6 @@ class Deribit():
             order = self._client.create_order(
                 instrument, 'limit', side, float(size), price)
 
-
     def cancelOrders(self, currency: str):
 
         r = self._client.fetch_open_orders()
@@ -75,7 +74,6 @@ class Deribit():
         for ord in r:
             if currency in ord['symbol']:
                 self._client.cancel_order(ord['id'])
-
 
     def portfoglioDelta(self, currency: str):
         '''
@@ -103,10 +101,10 @@ class Deribit():
 
         for pos in positions:
             if (currency in pos['info']['instrument_name']) and (optionType in pos['info']['instrument_name']) and pos['info']['kind'] == 'option' and pos['info']['direction'] == direction:
-                total_position = total_position + abs(float(pos['info']['size']))
-        
-        return total_position
+                total_position = total_position + \
+                    abs(float(pos['info']['size']))
 
+        return total_position
 
     def portfoglioHedge(self, hedgingThreshold: float, currency: str):
         '''
@@ -134,5 +132,3 @@ class Deribit():
         order_book = response_dict["result"]
 
         return order_book
-
-
