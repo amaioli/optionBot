@@ -8,8 +8,8 @@ pip install -r requirement.txt
 # Configuration parameters
 
 [STRATEGY]
-currency = BTC                          currency to operate with
-contractSize = 0.1                      options contract size
+currency = BTC currency to operate with
+contractSize = 0.1 options contract size
 compounding = False                     
 targetDelta = 0.15                      maximum delta during option selling
 optionSides = ['put', 'call']           side option selling 
