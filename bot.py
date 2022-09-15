@@ -58,7 +58,7 @@ class Bot:
                         # ADD POSITION
                         self.exchange.addPosition(
                             instrument, self.orderType, 'sell', self.contractSize - size)
-                        self.notifier.send(f'Added {instrument} with size {str(self.contractSize - size)}')
+                        self.notifier.send(f'Added {instrument} order with size {str(self.contractSize - size)}')
                     else:
                         logging.warning(
                             f'Not found option {optionType} matching the target delta')
