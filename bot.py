@@ -12,18 +12,18 @@ class Bot:
     Bot class
     '''
 
-    def __init__(self, currency, contractSize, targetDelta, optionSides, optionSettlement, hedging: bool, hedgingThreshold, orderType, exchange: Deribit, compounding, notifier: Notifier) -> None:
+    def __init__(self, config, exchange: Deribit, notifier: Notifier) -> None:
         self.positions = []
-        self.currency = currency
-        self.contractSize = float(contractSize)
-        self.targetDelta = float(targetDelta)
-        self.optionSides = optionSides
-        self.optionSettlement = optionSettlement
-        self.hedging = eval(hedging)
-        self.hedgingThreshold = float(hedgingThreshold)
-        self.orderType = orderType
+        self.currency = config['strategy']["currency"]
+        self.contractSize = float(config['strategy']["contractSize"])
+        self.targetDelta = float(config['strategy']["targetDelta"])
+        self.optionSides = config['strategy']["optionSides"]
+        self.optionSettlement = config['strategy']["optionSettlement"]
+        self.hedging = config['strategy']["hedging"]
+        self.hedgingThreshold = float(config['strategy']["hedgingThreshold"])
+        self.orderType = config['strategy']["orderType"]
         self.exchange = exchange
-        self.compounding = compounding
+        self.compounding = config['strategy']["compounding"]
         # self.sched = BackgroundScheduler()
         # self.sched.daemonic = False
         # self.sched.timezone = pytz.utc

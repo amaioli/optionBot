@@ -2,7 +2,7 @@ import requests, logging
 
 class Notifier():
     def __init__(self, chatId: str, alias: str):
-        self.chatId = chatId
+        self.chatId = str(chatId)
         self.alias = alias
 
     def send(self, message: str):
