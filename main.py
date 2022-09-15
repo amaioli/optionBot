@@ -8,6 +8,9 @@ import pytz
 import glob
 import yaml
 from apscheduler.schedulers.background import BackgroundScheduler
+from cerberus import Validator
+from utils import configParserYaml
+
 
 
 def handler(signum, frame):
@@ -30,9 +33,12 @@ sched.daemonic = False
 
 
 for config_file in glob.glob("./config/*.yaml"):
-    with open(config_file) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    # TODO config validator
+    # with open(config_file) as f:
+    #     try:
+    #         config = yaml.load(f, Loader=yaml.FullLoader)
+    #     except yaml.YAMLError as exception:
+    #         logging.error(f'Invalid yaml config file: {config_file}')
+    config = configParserYaml(config_file)
 
     # Instantiace exchange connector
     deribit = Deribit(config['deribit']["key"], config['deribit']["secret"])
@@ -45,7 +51,7 @@ for config_file in glob.glob("./config/*.yaml"):
     # Instantiace bot
     bot = Bot(config = config, exchange=deribit, notifier=notifier)
 
-    sched.add_job(bot.start, 'cron', minute=15)
+    sched.add_job(bot.start, 'cron', minute=30)
     notifier.send('Bot started')
 
 sched.start()

@@ -4,9 +4,6 @@ import json
 from utils import priceRounding
 import logging
 
-from typing import List
-
-
 class Deribit():
     def __init__(self, key, secret):
         self._client = ccxt.deribit({"apiKey": key, "secret": secret})

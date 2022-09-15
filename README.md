@@ -3,7 +3,7 @@ A bot managing a strangle selling strategy on Deribit.
 
 # Install
 
-pip install -r requirement.txt
+pip install -r requirements.txt
 
 # Configuration parameters
 
