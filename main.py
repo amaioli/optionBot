@@ -14,7 +14,7 @@ from utils import configParserYaml
 
 
 def handler(signum, frame):
-    # bot.stop()
+    bot.stop()
     sched.remove_all_jobs()
     sched.shutdown()
     exit(1)
@@ -51,7 +51,7 @@ for config_file in glob.glob("./config/*.yaml"):
     # Instantiace bot
     bot = Bot(config = config, exchange=deribit, notifier=notifier)
 
-    sched.add_job(bot.start, 'cron', minute=30)
+    sched.add_job(bot.start, 'cron', minute=10)
     notifier.send('Bot started')
 
 sched.start()

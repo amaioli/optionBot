@@ -37,7 +37,7 @@ class Bot:
         #     time.sleep(10)
 
     def stop(self):
-        # self.sched.remove_all_jobs()
+        self.exchange.cancelOrders(self.currency)
         # self.sched.shutdown()
         pass
 
