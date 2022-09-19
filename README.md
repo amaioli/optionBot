@@ -22,7 +22,7 @@ pip install -r requirements.txt
 | NOTIFICATION | Value | Desciption |
 | --- | --- |--- |
 | telegramChatId  | string  |Chatid to get notification from Telegram bot (@optionBot_bot) |
-| alias   | string (optional)  |Prepended id on chat message |
+| alias   | string (optional)  |string prefix on chat message |
 
 # Starting
 
