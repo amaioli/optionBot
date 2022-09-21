@@ -68,4 +68,4 @@ class Bot:
         logging.warning(f'Current Delta: {str(delta)}')
         if abs(delta) > self.hedgingThreshold:
             self.exchange.portfoglioHedge(self.hedgingThreshold, self.currency)
-            self.notifier.send(f'Hedging delta: {delta}')
+            self.notifier.send(f'Hedging delta: {delta} {self.currency}')

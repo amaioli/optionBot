@@ -90,7 +90,7 @@ class Deribit():
         :params: direction: 'buy' or 'sell'
         '''
 
-        positions = self._client.fetchPositions()
+        positions = self._client.fetchPositions(params = {'currency': currency, 'kind': 'option'})
 
         optionType = '-C' if optionType == 'call' else '-P'
 
