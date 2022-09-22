@@ -50,7 +50,7 @@ if __name__ == '__main__':
         # Instantiace bot
         bot = Bot(config = config, exchange=deribit, notifier=notifier)
 
-        sched.add_job(bot.start, 'cron', minute=38)
+        sched.add_job(bot.start, 'cron', minute=10)
         notifier.send(f'Bot started with config {config_file}')
 
     sched.start()

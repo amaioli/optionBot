@@ -17,11 +17,15 @@ class Deribit():
 
         # Build a list of instrument filtered and ordered based on parameters
         v = 1 if optionType == 'call' else -1
+
+        # For daily option strategy select also in the week expiration options
+        settlementPeriod = ('day', 'week') if settlementPeriod == 'day' else settlementPeriod
+
         market_list = sorted([ins for ins in self._client.markets.values() if
                               ins["base"] == base and
                               ins["optionType"] == optionType and
                               ins["info"]["kind"] == 'option' and
-                              ins["info"]["settlement_period"] == settlementPeriod and
+                              ins["info"]["settlement_period"] in settlementPeriod and
                               ins["info"]["is_active"] == True], key=lambda k: (k['expiry'], v*k['strike']))
 
         # Return the first instrument with delta below the parameter
