@@ -19,7 +19,6 @@ pip install -r requirements.txt
 | hedgingThreshold       | float (i.e. 0.03) |delta threshold to start heding |
 | rolling      | True or False |enable the rolling of position in profit |
 | rollingTargetProfit       | float 0-1 range (i.e. 0.80) |profit percentage to start rolling |
-
 | orderType       | taker or maker |‘taker’ to sell option on bid book. ‘maker’ to try selling at middle price |
 
 | NOTIFICATION | Value | Desciption |
