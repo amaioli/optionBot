@@ -1,16 +1,18 @@
 'strategy':
     currency: BTC
-    contractSize: 0.2
+    contractSize: 0.1
     compounding: False
     targetDelta: 0.15
     optionSides: ['put', 'call']
     optionSettlement: day
-    hedging: True
+    hedging: False
     hedgingThreshold: 0.06
+    rolling: True
+    rollingTargetProfit: 0.8
     orderType: maker
 'deribit':
-    key: xxxxx
-    secret: xxxxxx
+    key: xxx
+    secret: xxx
 'notification':
-    telegramChatId: xxxxx
+    telegramChatId: xxx
     alias: Main

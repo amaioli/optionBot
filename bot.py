@@ -1,8 +1,5 @@
 from utils import minimumOrder
-from apscheduler.schedulers.background import BackgroundScheduler
 import logging
-import pytz
-import time
 from deribit import Deribit
 from notifier import Notifier
 
@@ -21,20 +18,16 @@ class Bot:
         self.optionSettlement = config['strategy']["optionSettlement"]
         self.hedging = config['strategy']["hedging"]
         self.hedgingThreshold = float(config['strategy']["hedgingThreshold"])
+        self.rolling = config['strategy']["rolling"]
+        self.rollingTargetProfit = float(config['strategy']["rollingTargetProfit"])
         self.orderType = config['strategy']["orderType"]
         self.exchange = exchange
         self.compounding = config['strategy']["compounding"]
-        # self.sched = BackgroundScheduler()
-        # self.sched.daemonic = False
-        # self.sched.timezone = pytz.utc
         self.notifier = notifier
 
     def start(self):
         self.slotTimeHandler()
-        # self.sched.add_job(self.slotTimeHandler, 'cron', minute=30)
-        # self.sched.start()
-        # while True:
-        #     time.sleep(10)
+
 
     def stop(self):
         self.exchange.cancelOrders(self.currency)
@@ -48,10 +41,21 @@ class Bot:
         # MANAGE POSITIONS
         for optionType in ['put', 'call']:
             if optionType in self.optionSides:
-                size = self.exchange.fetchOptionPositions(
+                position = self.exchange.fetchOptionPositions(
                     optionType, self.currency)
-                if size < self.contractSize:
+                size = position[0]
+                instrumentName = position[1]
+                unPnl = position[2]
+                logging.warning(
+                            f'Instrument {instrumentName} Pnl {unPnl}')
 
+                if self.rolling and instrumentName and unPnl > self.rollingTargetProfit:
+                    # MANAGE ROLLING
+                    self.exchange.addPosition(instrumentName, 'taker', 'buy', size)
+                    self.notifier.send(f'Rolling {instrumentName} order with size {str(size)}')
+
+                if size < self.contractSize:
+                    # BUILD POSITIONS
                     instrument = self.exchange.findOption(
                         self.currency, optionType, self.optionSettlement, self.targetDelta)
                     if self.contractSize - size >= minimumOrder(self.currency) and instrument:
@@ -61,11 +65,13 @@ class Bot:
                         self.notifier.send(f'Added {instrument} order with size {str(self.contractSize - size)}')
                     else:
                         logging.warning(
-                            f'Not found option {optionType} matching the target delta')
+                            f'Not found option {optionType} matching the target delta')                            
 
-        # INTRADAY HEDGING SECTION
+
+        # INTRACYCLE HEDGING MANAGEMENT
         delta = self.exchange.portfoglioDelta(self.currency)
         logging.warning(f'Current Delta: {str(delta)}')
-        if abs(delta) > self.hedgingThreshold:
+        if self.hedging and abs(delta) > self.hedgingThreshold:
             self.exchange.portfoglioHedge(self.hedgingThreshold, self.currency)
             self.notifier.send(f'Hedging delta: {delta} {self.currency}')
+

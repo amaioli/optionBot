@@ -44,15 +44,25 @@ def minimumOrder(currency: str) -> float:
         return 1
 
 
-def priceRounding(bid: float, ask: float, asset: str, orderType: str = 'taker'):
+def priceRounding(bid: float, ask: float, asset: str, orderType: str = 'taker', side: str = 'short'):
     if orderType == 'taker':
-        return max(bid, 0.0005) if asset in ('BTC', 'ETH') else max(bid, 0.001)
+        if side == 'short':
+            return max(bid, 0.0005) if asset in ('BTC', 'ETH') else max(bid, 0.001)
+        # case side long
+        else:
+            return max(ask, 0.0005) if asset in ('BTC', 'ETH') else max(ask, 0.001)
     if asset in ('BTC', 'ETH'):
         middleRounded = int(((ask + bid) / 2) / 0.0005) * 0.0005
-        return max(bid, middleRounded, 0.0005)
+        if side == 'short':
+            return max(bid, middleRounded, 0.0005)
+        else:
+            return middleRounded
     else:
         middleRounded = int(((ask + bid) / 2) / 0.001) * 0.001
-        return max(bid, middleRounded, 0.001)
+        if side == 'short':
+            return max(bid, middleRounded, 0.001)
+        else:
+            return middleRounded
 
 
 
@@ -124,6 +134,14 @@ def configParserYaml(configFile):
                     "required": True,
                 },
                 "hedgingThreshold": {
+                    "type": "number",
+                    "required": True,
+                },
+                "rolling": {
+                    "type": "boolean",
+                    "required": True,
+                },
+                "rollingTargetProfit": {
                     "type": "number",
                     "required": True,
                 },

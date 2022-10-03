@@ -19,7 +19,7 @@ class Deribit():
         v = 1 if optionType == 'call' else -1
 
         # For daily option strategy select also in the week expiration options
-        settlementPeriod = ('day', 'week') if settlementPeriod == 'day' else settlementPeriod
+        settlementPeriod = ('day', 'week', 'month') if settlementPeriod == 'day' else settlementPeriod
 
         market_list = sorted([ins for ins in self._client.markets.values() if
                               ins["base"] == base and
@@ -58,14 +58,14 @@ class Deribit():
             price = size * price if 'PERPETUAL' in instrument else size
             logging.warning(
                 f'Added market order of {instrument} with size {size}')
-            order = self._client.create_order(
+            self._client.create_order(
                 symbol=instrument, type='market', side=side, amount=price)
 
         elif orderType == 'maker':
 
             logging.warning(
                 f'Added limit order of {instrument} with size {size} and price {price}')
-            order = self._client.create_order(
+            self._client.create_order(
                 instrument, 'limit', side, float(size), price)
 
     def cancelOrders(self, currency: str):
@@ -86,26 +86,35 @@ class Deribit():
 
         return float(r['info']['delta_total'])
 
-    def fetchOptionPositions(self, optionType: str, currency: str, direction: str = 'sell'):
+    def fetchOptionPositions(self, optionType: str, currency: str, side: str = 'short'):
         '''
         fetch size of options used by the strategy
         :params: optionType: 'put' or 'call'
         :params: currency: 'BTC, 'ETH' or 'SOL'
-        :params: direction: 'buy' or 'sell'
+        :params: side: 'buy' or 'sell'
         '''
+
+        side = 'sell' if side == 'short' else 'buy'
 
         positions = self._client.fetchPositions(params = {'currency': currency, 'kind': 'option'})
 
         optionType = '-C' if optionType == 'call' else '-P'
 
         total_position = 0
+        instrumentName = ""
+        unPnl = 0
 
         for pos in positions:
-            if (currency in pos['info']['instrument_name']) and (optionType in pos['info']['instrument_name']) and pos['info']['kind'] == 'option' and pos['info']['direction'] == direction:
+            if (currency in pos['info']['instrument_name']) and (optionType in pos['info']['instrument_name']) and pos['info']['kind'] == 'option' and pos['info']['direction'] == side:
                 total_position = total_position + \
                     abs(float(pos['info']['size']))
+                instrumentName = pos['info']['instrument_name']
+                orderBook = self._getOrderBook(instrumentName)
+                best_bid_price = float(orderBook['best_bid_price'])
+                best_ask_price = float(orderBook['best_ask_price'])
+                unPnl = ((- best_ask_price + pos['entryPrice']) / pos['entryPrice']) if side == 'sell' else ((best_bid_price - pos['entryPrice']) / pos['entryPrice'])
 
-        return total_position
+        return total_position, instrumentName, unPnl
 
     def portfoglioHedge(self, hedgingThreshold: float, currency: str):
         '''
