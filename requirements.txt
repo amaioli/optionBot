@@ -1,3 +1,4 @@
 ccxt
 apscheduler
 cerberus
+python-telegram-bot

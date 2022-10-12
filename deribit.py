@@ -8,6 +8,8 @@ class Deribit():
     def __init__(self, key, secret):
         self._client = ccxt.deribit({"apiKey": key, "secret": secret})
         self._client.load_markets(reload=True)
+        self._client.enableRateLimit = True
+        self.logger = logging.getLogger(__name__)
 
     def findOption(self, base: str, optionType: str, settlementPeriod: str, delta: float):
         '''
@@ -56,14 +58,14 @@ class Deribit():
         if orderType == 'taker':
 
             price = size * price if 'PERPETUAL' in instrument else size
-            logging.warning(
+            self.logger.warning(
                 f'Added market order of {instrument} with size {size}')
             self._client.create_order(
                 symbol=instrument, type='market', side=side, amount=price)
 
         elif orderType == 'maker':
 
-            logging.warning(
+            self.logger.warning(
                 f'Added limit order of {instrument} with size {size} and price {price}')
             self._client.create_order(
                 instrument, 'limit', side, float(size), price)

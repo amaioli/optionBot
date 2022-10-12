@@ -24,6 +24,7 @@ class Bot:
         self.exchange = exchange
         self.compounding = config['strategy']["compounding"]
         self.notifier = notifier
+        self.logger = logging.getLogger(__name__)
 
     def start(self):
         self.slotTimeHandler()
@@ -46,7 +47,7 @@ class Bot:
                 size = position[0]
                 instrumentName = position[1]
                 unPnl = position[2]
-                logging.warning(
+                self.logger.warning(
                             f'Instrument {instrumentName} Pnl {unPnl}')
 
                 if self.rolling and instrumentName and unPnl > self.rollingTargetProfit:
@@ -64,13 +65,13 @@ class Bot:
                             instrument, self.orderType, 'sell', self.contractSize - size)
                         self.notifier.send(f'Added {instrument} order with size {str(self.contractSize - size)}')
                     else:
-                        logging.warning(
+                        self.logger.warning(
                             f'Not found option {optionType} matching the target delta')                            
 
 
         # INTRACYCLE HEDGING MANAGEMENT
         delta = self.exchange.portfoglioDelta(self.currency)
-        logging.warning(f'Current Delta: {str(delta)}')
+        self.logger.warning(f'Current Delta: {str(delta)}')
         if self.hedging and abs(delta) > self.hedgingThreshold:
             self.exchange.portfoglioHedge(self.hedgingThreshold, self.currency)
             self.notifier.send(f'Hedging delta: {delta} {self.currency}')

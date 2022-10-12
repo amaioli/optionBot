@@ -2,6 +2,7 @@ from bot import Bot
 import signal
 from deribit import Deribit
 from notifier import Notifier
+from telegramServer import TelegramServer
 import logging
 import time
 import pytz
@@ -27,6 +28,7 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.WARNING)
     FORMAT = '%(asctime)s %(message)s'
     logging.basicConfig(format=FORMAT)
+    logger = logging.getLogger(__name__)
 
     # Bots scheduler creation
     sched = BackgroundScheduler()
@@ -41,7 +43,6 @@ if __name__ == '__main__':
 
         # Instantiace exchange connector
         deribit = Deribit(config['deribit']["key"], config['deribit']["secret"])
-        deribit.enableRateLimit = True
 
         # Instantiace notifier
         notifier = Notifier(
@@ -50,10 +51,14 @@ if __name__ == '__main__':
         # Instantiace bot
         bot = Bot(config = config, exchange=deribit, notifier=notifier)
 
+
         sched.add_job(bot.start, 'cron', minute=10)
         notifier.send(f'Bot started with config {config_file}')
 
     sched.start()
 
-    while True:
-        time.sleep(10)
+    TelegramServer(sched)
+
+
+    # while True:
+    #     time.sleep(10)
